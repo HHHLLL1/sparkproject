@@ -1,3 +1,3 @@
 # sparkproject
 
-基于spark和hbasse的数据可视化网页
+基于spark和hbasse的电影数据可视化网页
