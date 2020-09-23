@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th=www.thymeleaf.org>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/echarts.min.js"></script>
+    <script src="js/jquery-3.2.1.js"></script>
+</head>
+
+
+<body>
+    <div align="center">
+        <div id="header" style="background-color:#FFA500; margin-bottom:30px">
+            <h1 style="margin:10px;">TMDB电影数据分析</h1>
+        </div>
+        <div id="popdiv" style="width:750px; height:500px; float:left; margin:10px"></div>
+        <div id="rundiv" style="width:700px; height:500px; float:right; margin:10px"></div>
+    </div>
+
+    <script id="popularity" type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('popdiv'));
+
+        var l = "[[${l}]]";
+        var nums = "[[${nums}]]";
+
+        var productName = [];
+        var nums = [];
+
+        //AJAX接收数据主体
+        $.ajax({
+            type:"GET",
+            url:"/popularity",
+            dataType:"json",
+            async:false,
+            success:function (result) {
+
+                for (var i = 0; i < result.length; i++){
+                    productName.push(result[i].productName);
+                    nums.push(result[i].nums);
+                }
+            },
+            error :function(errorMsg) {
+                alert("获取后台数据失败！");
+            }
+        });
+
+
+        // 指定图表的配置项和数据
+        var option = {
+            title: {
+                text: '电影流行度排名',
+                subtext: 'top10'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {
+                data:['流行度']
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+    },
+            xAxis: {
+                type: 'value',
+            },
+            yAxis: {
+                <!--type: 'category',-->
+                data: productName
+            },
+            series: [{
+                name: '流行度',
+                type: 'bar',
+                data: nums
+            }]
+        };
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    </script>
+
+    <script id="runtime" type="text/javascript">
+        var myChart = echarts.init(document.getElementById('rundiv'));
+
+        var option = {
+            title : {
+                text: '电影时长统计',
+                subtext: 'count大于100',
+                x:'center'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                <!--is_show: 'false,'-->
+                orient: 'vertical',
+                left: 'left',
+            },
+            series : [
+                {
+                    name: 'count',
+                    type: 'pie',
+                    radius : [40, 150],
+                    center: ['50%', '60%'],
+                    roseType: 'area',
+                    data:(function () {
+
+                        var datas = [];
+                        $.ajax({
+                            type:"POST",
+                            url:"/runtime",
+                            dataType:"json",
+                            async:false,
+                            success:function (result) {
+
+                                for (var i = 0; i < result.length; i++){
+                                    datas.push({
+                                        "value":result[i].nums, "name":result[i].productName
+                                    })
+                                }
+
+                            }
+                        })
+                        return datas;
+
+                    })(),
+                    itemStyle: {
+                        emphasis: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                }
+            ]
+        };
+        myChart.setOption(option);
+    </script>
+
+
+</body>
+</html>
