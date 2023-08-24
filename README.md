@@ -1,3 +1,5 @@
 # sparkproject
 
 基于spark和hbase的电影数据可视化网页
+
+使用scala+java语言完成，基于虚拟机搭建spark分布式集群，使用spring创建web项目，使用mongoDB存储数据，spark sql离线读取和处理数据完成统计任务，结合spark streaming、flume和kafka实现实时数据处理，完成实时日志处理。
